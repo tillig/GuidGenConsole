@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuidGenConsole", "GuidGenConsole.csproj", "{19232EC4-A066-4874-A537-2CF4C5D51A97}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuidGenConsole", "GuidGenConsole\GuidGenConsole.csproj", "{19232EC4-A066-4874-A537-2CF4C5D51A97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
