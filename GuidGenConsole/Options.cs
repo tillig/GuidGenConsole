@@ -1,92 +1,92 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
+using CommandLine;
+using CommandLine.Text;
 
 namespace Paraesthesia.Applications.GuidGenConsole
 {
 	public class Options
 	{
-		private static readonly Regex ArgParser = new Regex(@"^\/(?<name>[\w\?])(\s*=\s*(?<value>[\d\w]+))?$", RegexOptions.ExplicitCapture);
+		private const string FormatHelp = @"The GUID format to generate. Options include:
+ole - IMPLEMENT_OLECREATE(...)
+def - DEFINE_GUID(...)
+struct - static const struct Guid = {{...}}
+reg - Registry Format
+custom - Custom format (specify /s with the format)
+If omitted, the GUID will be unformatted.";
 
-		public string Format { get; set; } = GuidFormat.FormatDefault;
+		[Option('f', "format", HelpText = FormatHelp)]
+		public GuidFormat Format { get; set; }
 
-		public int Quantity { get; set; } = 1;
+		[Option('s', HelpText = "If 'format' is 'custom,' this is the custom format string. Use String.Format style.")]
+		public string FormatString { get; set; }
 
-		/// <summary>
-		/// Parse command line arguments.
-		/// </summary>
-		/// <param name="args">The set of arguments to parse.</param>
-		/// <exception cref="System.ArgumentException">
-		/// Thrown if there is any problem parsing arguments and indicates help
-		/// should be displayed.
-		/// </exception>
-		public static Options Parse(string[] args)
+		[Option('q', "quantity", HelpText = "The number of GUIDs to generate.")]
+		public int Quantity { get; set; }
+
+		[Usage(ApplicationAlias = "guidgenconsole")]
+		public static IEnumerable<Example> Examples
 		{
-			var options = new Options();
-
-			// No args to parse
-			if (args == null || args.Length == 0)
+			get
 			{
-				return options;
+				yield return new Example("Unformatted GUID", new Options());
+				yield return new Example("Two registry format GUIDs", new Options { Format = GuidFormat.reg, Quantity = 2 });
+				yield return new Example("Custom format GUID", new Options { Format = GuidFormat.custom, FormatString = "{0:N}" });
+			}
+		}
+
+		public void Normalize()
+		{
+			if (string.IsNullOrEmpty(this.FormatString))
+			{
+				this.FormatString = GuidFormatStrings.FormatDefault;
 			}
 
-			// Set up parser
-
-			for (var i = 0; i < args.Length; i++)
+			if (this.Format != GuidFormat.custom)
 			{
-				// Get the name and optional value for each argument
-				var parsed = ArgParser.Match(args[i]);
-				if (parsed == null || !parsed.Success)
+				switch (this.Format)
 				{
-					throw new ArgumentException(string.Format("Incorrect argument format: {0}", args[i]));
-				}
-
-				switch (parsed.Groups["name"].Value)
-				{
-					case "f":
-						// Format
-						switch (parsed.Groups["value"].Value)
-						{
-							case "o":
-								options.Format = GuidFormat.FormatImplementOleCreate;
-								break;
-							case "d":
-								options.Format = GuidFormat.FormatDefineGuid;
-								break;
-							case "s":
-								options.Format = GuidFormat.FormatStaticConstStruct;
-								break;
-							case "r":
-								options.Format = GuidFormat.FormatRegistry;
-								break;
-							default:
-								throw new ArgumentException(string.Format("Unknown/unspecified format type: {0}", parsed.Groups["value"].Value));
-						}
+					case GuidFormat.def:
+						this.FormatString = GuidFormatStrings.FormatDefineGuid;
 						break;
-
-					case "q":
-						// Quantity
-						try
-						{
-							options.Quantity = int.Parse(parsed.Groups["value"].Value);
-							if (options.Quantity < 1)
-							{
-								options.Quantity = 1;
-							}
-						}
-						catch (Exception)
-						{
-							throw new ArgumentException(string.Format("Invalid quantity specified: {0}", parsed.Groups["value"].Value));
-						}
+					case GuidFormat.ole:
+						this.FormatString = GuidFormatStrings.FormatImplementOleCreate;
 						break;
-
-					case "?":
-					default:
-						// Display help
-						throw new ArgumentException("");
+					case GuidFormat.reg:
+						this.FormatString = GuidFormatStrings.FormatRegistry;
+						break;
+					case GuidFormat.@struct:
+						this.FormatString = GuidFormatStrings.FormatStaticConstStruct;
+						break;
 				}
 			}
 
-			return options;
+			if (this.Quantity < 1)
+			{
+				this.Quantity = 1;
+			}
+		}
+
+		public void GetUsage()
+		{
+
+			//var asmName = Assembly.GetExecutingAssembly().GetName();
+			//output.WriteLine("{0} v{1}", asmName.Name, asmName.Version);
+			//output.WriteLine("Generates GUIDs in various formats and copies to the clipboard.");
+			//output.WriteLine("{0} [/f=format] [/q=quantity]", asmName.Name);
+			//output.WriteLine("{0} [/?]\n", asmName.Name);
+			//output.WriteLine("Parameters:");
+			//output.WriteLine("format: The GUID format to generate.  Valid choices are...");
+			//output.WriteLine("    o - IMPLEMENT_OLECREATE(...)");
+			//output.WriteLine("    d - DEFINE_GUID(...)");
+			//output.WriteLine("    s - static const struct Guid = {{...}}");
+			//output.WriteLine("    r - Registry Format");
+			//output.WriteLine("    If omitted, the GUID will be unformatted.");
+			//output.WriteLine("quantity: The number of GUIDs to generate. Defaults to 1.\n");
+			//output.WriteLine("?: Displays this help text.\n");
+			//output.WriteLine("Example:");
+			//output.WriteLine("{0} /f=r /q=3\n", asmName.Name);
 		}
 	}
 }

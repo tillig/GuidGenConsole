@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Windows.Forms;
+using CommandLine;
 
 namespace Paraesthesia.Applications.GuidGenConsole
 {
@@ -14,18 +16,15 @@ namespace Paraesthesia.Applications.GuidGenConsole
 		[STAThread]
 		public static int Main(string[] args)
 		{
-			// Parse arguments and set values for processing
-			Options options;
-			try
-			{
-				options = Options.Parse(args);
-			}
-			catch (ArgumentException err)
-			{
-				Console.Error.WriteLine(err.Message);
-				Help.Show(Console.Error);
-				return 1;
-			}
+			return Parser.Default.ParseArguments<Options>(args)
+				.MapResult(
+					options => Main(options),
+					_ => 1);
+		}
+
+		public static int Main(Options options)
+		{
+			options.Normalize();
 
 			// Prepare for clipboard storage
 			var output = new string[options.Quantity];
@@ -44,7 +43,7 @@ namespace Paraesthesia.Applications.GuidGenConsole
 
 				// Format and display the GUID
 				var toDisplay = string.Format(
-					options.Format,
+					options.FormatString,
 					guid,
 					guidBlocks[0],
 					guidBlocks[1],

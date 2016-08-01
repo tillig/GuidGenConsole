@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CommandLine;
 using Xunit;
 
 namespace Paraesthesia.Applications.GuidGenConsole.Test
@@ -9,39 +10,42 @@ namespace Paraesthesia.Applications.GuidGenConsole.Test
 		[Fact]
 		public void Parse_EmptyArgs()
 		{
-			var options = Options.Parse(new string[0]);
-			Assert.Equal(1, options.Quantity);
-			Assert.Equal(GuidFormat.FormatDefault, options.Format);
+			var result = Parser.Default.ParseArguments<Options>(new string[0]);
+			result.MapResult(
+				options =>
+				{
+					Assert.Equal(0, options.Quantity);
+					Assert.Equal(null, options.FormatString);
+					return 0;
+				},
+				options => { throw new Exception("Options were not parsed."); });
 		}
 
 		[Theory]
-		[InlineData("/f=o", GuidFormat.FormatImplementOleCreate)]
-		[InlineData("/f=d", GuidFormat.FormatDefineGuid)]
-		[InlineData("/f=s", GuidFormat.FormatStaticConstStruct)]
-		[InlineData("/f=r", GuidFormat.FormatRegistry)]
-		public void Parse_Format(string arg, string expected)
+		[InlineData("-f ole", GuidFormatStrings.FormatImplementOleCreate)]
+		[InlineData("-f def", GuidFormatStrings.FormatDefineGuid)]
+		[InlineData("-f struct", GuidFormatStrings.FormatStaticConstStruct)]
+		[InlineData("-f reg", GuidFormatStrings.FormatRegistry)]
+		[InlineData("-f custom", GuidFormatStrings.FormatDefault)]
+		public void Parse_Format(string arg, string expectedFormatString)
 		{
-			var options = Options.Parse(new string[] { arg });
-			Assert.Equal(expected, options.Format);
-		}
-
-		[Fact]
-		public void Parse_NullArgs()
-		{
-			var options = Options.Parse(null);
-			Assert.Equal(1, options.Quantity);
-			Assert.Equal(GuidFormat.FormatDefault, options.Format);
+			var result = Parser.Default.ParseArguments<Options>(new string[] { arg });
+			result.MapResult(
+				options => { options.Normalize(); Assert.Equal(expectedFormatString, options.FormatString); return 0; },
+				options => { throw new Exception("Options were not parsed."); });
 		}
 
 		[Theory]
-		[InlineData("/q=-1", 1)]
-		[InlineData("/q=0", 1)]
-		[InlineData("/q=1", 1)]
-		[InlineData("/q=10", 10)]
+		[InlineData("-q -1", 1)]
+		[InlineData("-q 0", 1)]
+		[InlineData("-q 1", 1)]
+		[InlineData("-q 10", 10)]
 		public void Parse_Quantity(string arg, int expected)
 		{
-			var options = Options.Parse(new string[] { arg });
-			Assert.Equal(expected, options.Quantity);
+			var result = Parser.Default.ParseArguments<Options>(new string[] { arg });
+			result.MapResult(
+				options => { options.Normalize(); Assert.Equal(expected, options.Quantity); return 0; },
+				options => { throw new Exception("Options were not parsed."); });
 		}
 	}
 }
