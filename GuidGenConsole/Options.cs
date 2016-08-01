@@ -8,18 +8,10 @@ namespace Paraesthesia.Applications.GuidGenConsole
 {
 	public class Options
 	{
-		private const string FormatHelp = @"The GUID format to generate. Options include:
-ole - IMPLEMENT_OLECREATE(...)
-def - DEFINE_GUID(...)
-struct - static const struct Guid = {{...}}
-reg - Registry Format
-custom - Custom format (specify /s with the format)
-If omitted, the GUID will be unformatted.";
-
-		[Option('f', "format", HelpText = FormatHelp)]
+		[Option('f', "format", HelpText = "The GUID format to generate. If omitted, the GUID will be unformatted.")]
 		public GuidFormat Format { get; set; }
 
-		[Option('s', HelpText = "If 'format' is 'custom,' this is the custom format string. Use String.Format style.")]
+		[Option('s', HelpText = "If 'format' is 'custom,' this is the custom format string. Use String.Format style ({0:NDBPXUL}) - U/L indicates upper/lower case.")]
 		public string FormatString { get; set; }
 
 		[Option('q', "quantity", HelpText = "The number of GUIDs to generate.")]
@@ -31,8 +23,11 @@ If omitted, the GUID will be unformatted.";
 			get
 			{
 				yield return new Example("Unformatted GUID", new Options());
-				yield return new Example("Two registry format GUIDs", new Options { Format = GuidFormat.reg, Quantity = 2 });
-				yield return new Example("Custom format GUID", new Options { Format = GuidFormat.custom, FormatString = "{0:N}" });
+				yield return new Example("Custom format", new Options { Format = GuidFormat.custom, FormatString = "{0:NU}" });
+				yield return new Example("Registry {xxxxxxxx-xxxx-....}", new Options { Format = GuidFormat.reg });
+				yield return new Example("IMPLEMENT_OLECREATE(...)", new Options { Format = GuidFormat.ole });
+				yield return new Example("DEFINE_GUID(...)", new Options { Format = GuidFormat.def });
+				yield return new Example("static const struct Guid = {{...}}", new Options { Format = GuidFormat.@struct });
 			}
 		}
 
@@ -66,27 +61,6 @@ If omitted, the GUID will be unformatted.";
 			{
 				this.Quantity = 1;
 			}
-		}
-
-		public void GetUsage()
-		{
-
-			//var asmName = Assembly.GetExecutingAssembly().GetName();
-			//output.WriteLine("{0} v{1}", asmName.Name, asmName.Version);
-			//output.WriteLine("Generates GUIDs in various formats and copies to the clipboard.");
-			//output.WriteLine("{0} [/f=format] [/q=quantity]", asmName.Name);
-			//output.WriteLine("{0} [/?]\n", asmName.Name);
-			//output.WriteLine("Parameters:");
-			//output.WriteLine("format: The GUID format to generate.  Valid choices are...");
-			//output.WriteLine("    o - IMPLEMENT_OLECREATE(...)");
-			//output.WriteLine("    d - DEFINE_GUID(...)");
-			//output.WriteLine("    s - static const struct Guid = {{...}}");
-			//output.WriteLine("    r - Registry Format");
-			//output.WriteLine("    If omitted, the GUID will be unformatted.");
-			//output.WriteLine("quantity: The number of GUIDs to generate. Defaults to 1.\n");
-			//output.WriteLine("?: Displays this help text.\n");
-			//output.WriteLine("Example:");
-			//output.WriteLine("{0} /f=r /q=3\n", asmName.Name);
 		}
 	}
 }

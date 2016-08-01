@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="GuidFormat.cs" />
+    <Compile Include="GuidFormatProvider.cs" />
     <Compile Include="GuidFormatStrings.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

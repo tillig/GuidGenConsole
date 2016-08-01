@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using CommandLine;
@@ -43,6 +44,7 @@ namespace Paraesthesia.Applications.GuidGenConsole
 
 				// Format and display the GUID
 				var toDisplay = string.Format(
+					new GuidFormatProvider(CultureInfo.CurrentCulture),
 					options.FormatString,
 					guid,
 					guidBlocks[0],
