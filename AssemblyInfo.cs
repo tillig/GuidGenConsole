@@ -6,5 +6,5 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCompany("Paraesthesia")]
 [assembly: AssemblyCopyright("(c) 2007 Travis Illig")]
 
-[assembly: AssemblyVersion("1.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
 
