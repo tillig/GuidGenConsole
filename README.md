@@ -1,6 +1,8 @@
 # GuidGenConsole
 Command-line utility for generating GUID values, formatting them, and putting them on the clipboard.
 
+![GuidGenConsole 2.0](https://cloud.githubusercontent.com/assets/1156571/21691848/23635fac-d32f-11e6-990c-b2601f42437d.png)
+
 ## Options
 
 | Option | Description |
